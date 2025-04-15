@@ -1,12 +1,13 @@
 package com.stockfolio.service;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
 import com.stockfolio.model.Portfolio;
 import com.stockfolio.model.StockHolding;
 import com.stockfolio.repository.PortfolioRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PortfolioService {
@@ -19,6 +20,7 @@ public class PortfolioService {
         this.stockService = stockService;
     }
 
+    // Changed: userId parameter type changed from ObjectId to String
     public List<Portfolio> getUserPortfolios(String userId) {
         return portfolioRepository.findByUserId(userId);
     }
@@ -28,6 +30,7 @@ public class PortfolioService {
                 .orElseThrow(() -> new RuntimeException("Portfolio not found with id: " + id));
     }
 
+    // Changed: userId parameter type changed from ObjectId to String
     public Portfolio createPortfolio(String userId, String name) {
         Optional<Portfolio> existingPortfolio = portfolioRepository.findByUserIdAndName(userId, name);
         if (existingPortfolio.isPresent()) {

@@ -2,6 +2,9 @@ package com.stockfolio.model;
 
 import java.util.Date;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document
 public class StockHolding {
     
     private String symbol;

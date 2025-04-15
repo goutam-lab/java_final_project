@@ -34,7 +34,7 @@ export default function StockList({ filter = "all" }: { filter?: string }) {
         setError(null)
 
         // Remove hardcoded "AAPL" query for "all" filter to fetch random stocks
-        const query = filter === "AAPL" ? "" : filter
+        const query = filter === "INR" ? "" : filter
         
         console.log('Fetching stocks with query:', query)
         const response = await apiService.searchStocks(query)

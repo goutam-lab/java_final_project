@@ -1,12 +1,11 @@
-// API Service for Stockfolio Frontend
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
   data?: T;
   error?: string;
 }
 
-class ApiService {
+export class ApiService {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
     const token = localStorage.getItem('token');
     const headers = {
@@ -14,6 +13,7 @@ class ApiService {
       ...(token && { 'Authorization': `Bearer ${token}` }),
       ...options.headers,
     };
+    
 
     try {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -38,6 +38,13 @@ class ApiService {
     return this.request<{ token: string }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
+    });
+  }
+  // portfollio
+  async addStockToPortfolio(portfolioId: string, stock: { symbol: string; name: string; quantity: number; price: number }) {
+    return this.request(`/portfolios/${portfolioId}/stocks`, {
+      method: 'POST',
+      body: JSON.stringify(stock),
     });
   }
 
@@ -76,7 +83,7 @@ class ApiService {
         price?: number;
         change?: number;
         change_percent?: number;
-      }>
+      }>;
     }>(`/stocks/search?query=${encodeURIComponent(query)}`);
   }
 }

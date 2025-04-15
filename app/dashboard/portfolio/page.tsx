@@ -1,22 +1,140 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ArrowUpRight, Filter, Plus } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "../../../components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs"
 
-import DashboardNav from "@/components/dashboard-nav"
-import PortfolioOverview from "@/components/portfolio-overview"
-import PortfolioChart from "@/components/portfolio-chart"
-import StockList from "@/components/stock-list"
-import AddStockModal from "@/components/add-stock-modal"
-import PortfolioPerformance from "@/components/portfolio-performance"
+import DashboardNav from "../../../components/dashboard-nav"
+import PortfolioChart from "../../../components/portfolio-chart"
+import PortfolioOverview from "../../../components/portfolio-overview"
+import PortfolioPerformance from "../../../components/portfolio-performance"
+import StockList from "../../../components/stock-list"
+import AddStockModal from "../../../components/add-stock-modal"
+
+import { useAuth } from "../../context/AuthContext"
+import { apiService } from "../../lib/api"
+
+interface Stock {
+  symbol: string
+  name: string
+  exchange: string
+  currency: string
+  type: string
+}
+
+interface PortfolioSummary {
+  totalInvestment: number
+  currentValue: number
+  profitLoss: number
+  totalStocks: number
+}
+
+interface PortfolioHolding {
+  symbol: string
+  name: string
+  exchange?: string
+  currency?: string
+  type?: string
+}
+
+interface Portfolio {
+  id: string
+  totalInvestment: number
+  currentValue: number
+  profitLoss: number
+  holdings: PortfolioHolding[]
+}
+
+interface PortfolioData {
+  summary: PortfolioSummary
+  stocks: Stock[]
+  portfolioId: string
+}
 
 export default function PortfolioPage() {
+  const { user } = useAuth()
   const [isAddStockOpen, setIsAddStockOpen] = useState(false)
+  const [portfolioData, setPortfolioData] = useState<PortfolioData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function fetchPortfolios() {
+      if (!user) {
+        setPortfolioData(null)
+        setLoading(false)
+        return
+      }
+      setLoading(true)
+      setError(null)
+      try {
+        const response = await apiService.getUserPortfolios()
+        if (Array.isArray(response.data) && response.data.length > 0) {
+          const portfolio: Portfolio = response.data[0]
+          const summary: PortfolioSummary = {
+            totalInvestment: portfolio.totalInvestment,
+            currentValue: portfolio.currentValue,
+            profitLoss: portfolio.profitLoss,
+            totalStocks: portfolio.holdings.length,
+          }
+          const stocks: Stock[] = portfolio.holdings.map((h) => ({
+            symbol: h.symbol,
+            name: h.name,
+            exchange: h.exchange || "",
+            currency: h.currency || "",
+            type: h.type || "",
+          }))
+          setPortfolioData({ summary, stocks, portfolioId: portfolio.id })
+        } else {
+          setPortfolioData(null)
+        }
+      } catch (err) {
+        setError("Failed to load portfolio data.")
+        setPortfolioData(null)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchPortfolios()
+  }, [user])
+
+  if (!user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Please log in to view your portfolio.</p>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Loading portfolio data...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>{error}</p>
+      </div>
+    )
+  }
+
+  if (!portfolioData) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>No portfolio data available for your account.</p>
+      </div>
+    )
+  }
+
+  const { summary, stocks, portfolioId } = portfolioData
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -57,7 +175,7 @@ export default function PortfolioPage() {
               </svg>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">₹125,000</div>
+              <div className="text-2xl font-bold">₹{summary.totalInvestment.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">+2.5% from last month</p>
             </CardContent>
           </Card>
@@ -81,7 +199,7 @@ export default function PortfolioPage() {
               </svg>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">₹142,350</div>
+              <div className="text-2xl font-bold">₹{summary.currentValue.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">+13.88% from investment</p>
             </CardContent>
           </Card>
@@ -96,14 +214,14 @@ export default function PortfolioPage() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth="2"
-                className="h-4 w-4 text-muted-foreground"
+                className="h-4 w-4 text-green-500"
               >
                 <rect width="20" height="14" x="2" y="5" rx="2" />
                 <path d="M2 10h20" />
               </svg>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-500">+₹17,350</div>
+              <div className="text-2xl font-bold text-green-500">+₹{summary.profitLoss.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">+13.88% return</p>
             </CardContent>
           </Card>
@@ -124,7 +242,7 @@ export default function PortfolioPage() {
               </svg>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">8</div>
+              <div className="text-2xl font-bold">{summary.totalStocks}</div>
               <p className="text-xs text-muted-foreground">+2 from last month</p>
             </CardContent>
           </Card>
@@ -187,7 +305,7 @@ export default function PortfolioPage() {
           </Tabs>
         </div>
       </main>
-      <AddStockModal open={isAddStockOpen} onOpenChange={setIsAddStockOpen} />
+      <AddStockModal open={isAddStockOpen} onOpenChange={setIsAddStockOpen} portfolioId={portfolioId} />
     </div>
   )
 }
