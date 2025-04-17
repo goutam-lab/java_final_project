@@ -3,6 +3,7 @@ C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\con
 C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\config\MongoConfig.java
 C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\config\RestTemplateConfig.java
 C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\service\UserService.java
+C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\migration\AddPortfolioDataForUserMigration.java
 C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\service\PortfolioService.java
 C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\repository\PortfolioRepository.java
 C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\controller\PortfolioController.java

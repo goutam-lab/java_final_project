@@ -48,6 +48,14 @@ class ApiService {
     }
   }
 
+  async updateUser(data: { name: string; email: string }): Promise<ApiResponse<void>> {
+    console.log('Updating user with data:', data);
+    return this.request(`/users/me`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    });
+}
+
   // Stock Data API
   async searchStocks(query: string): Promise<{ data?: StockData[], error?: string }> {
     const response = await this.request<any>(`/stocks/search?query=${encodeURIComponent(query)}`);

@@ -13,7 +13,6 @@ export class ApiService {
       ...(token && { 'Authorization': `Bearer ${token}` }),
       ...options.headers,
     };
-    
 
     try {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -40,11 +39,20 @@ export class ApiService {
       body: JSON.stringify({ email, password }),
     });
   }
-  // portfollio
-  async addStockToPortfolio(portfolioId: string, stock: { symbol: string; name: string; quantity: number; price: number }) {
-    return this.request(`/portfolios/${portfolioId}/stocks`, {
-      method: 'POST',
-      body: JSON.stringify(stock),
+
+  async updateUser(data: { name: string; email: string }): Promise<void> {
+    return fetch('/api/user', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    }).then((response) => {
+      if (!response.ok) {
+        return response.text().then((text) => {
+          throw new Error(`Failed to update user: ${text}`);
+        });
+      }
     });
   }
 
@@ -86,6 +94,7 @@ export class ApiService {
       }>;
     }>(`/stocks/search?query=${encodeURIComponent(query)}`);
   }
+  
 }
 
 export const apiService = new ApiService();

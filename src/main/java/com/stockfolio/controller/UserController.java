@@ -1,13 +1,18 @@
 package com.stockfolio.controller;
 
-import com.stockfolio.model.User;
-import com.stockfolio.service.UserService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.stockfolio.model.User;
+import com.stockfolio.service.UserService;
 
 @RestController
 @RequestMapping("/api/users")
@@ -41,6 +46,10 @@ public class UserController {
             user.setName(request.getName());
         }
         
+        if (request.getEmail() != null && !request.getEmail().isEmpty()) {
+            user.setEmail(request.getEmail()); // Update email if provided
+        }
+        
         User updatedUser = userService.updateUser(user);
         
         Map<String, Object> response = new HashMap<>();
@@ -53,6 +62,7 @@ public class UserController {
 
     public static class UpdateUserRequest {
         private String name;
+        private String email; // Add email field
 
         public String getName() {
             return name;
@@ -60,6 +70,14 @@ public class UserController {
 
         public void setName(String name) {
             this.name = name;
+        }
+
+        public String getEmail() {
+            return email; // Getter for email
+        }
+
+        public void setEmail(String email) {
+            this.email = email; // Setter for email
         }
     }
 }
