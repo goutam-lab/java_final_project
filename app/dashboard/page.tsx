@@ -22,11 +22,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import PortfolioOverview from "@/components/portfolio-overview"
 import PortfolioChart from "@/components/portfolio-chart"
 import StockList from "@/components/stock-list"
+import { useAuth as useAuthContext } from "../context/AuthContext"; // Renamed to avoid conflict
+
 import AddStockModal from "@/components/add-stock-modal"
 
 export default function DashboardPage() {
   const router = useRouter()
   const [isAddStockOpen, setIsAddStockOpen] = useState(false)
+  const { user } = useAuthContext()
 
   const handleLogout = () => {
     // In a real app, this would call your Spring Boot logout endpoint
@@ -107,7 +110,7 @@ export default function DashboardPage() {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-1">
                   <User className="h-4 w-4" />
-                  <span className="hidden sm:inline-block">John Doe</span>
+                  <span className="hidden sm:inline-block">{user?.name || "User"}</span>
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -140,7 +143,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Dashboard</h1>
-            <p className="text-muted-foreground">Welcome back, John Doe</p>
+            <p className="text-muted-foreground">Welcome back, {user?.name || "User"}</p>
           </div>
           <Button onClick={() => setIsAddStockOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
@@ -285,3 +288,8 @@ export default function DashboardPage() {
     </div>
   )
 }
+
+function useAuth(): { user: any } {
+  throw new Error("Function not implemented.")
+}
+
