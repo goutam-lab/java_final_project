@@ -78,7 +78,7 @@ export default function DashboardPage() {
               <SheetContent side="left" className="w-[240px] sm:w-[280px]">
                 <nav className="flex flex-col gap-4 py-4">
                   <Link href="/dashboard" className="flex items-center gap-2 text-lg font-semibold">
-                    StockFolio
+                   InvestInSight
                   </Link>
                   <Link href="/dashboard" className="flex items-center gap-2 text-sm font-medium">
                     Dashboard
@@ -98,7 +98,7 @@ export default function DashboardPage() {
           </div>
           <div className="mr-4 hidden md:flex">
             <Link href="/" className="mr-6 flex items-center space-x-2">
-              <span className="font-bold">StockFolio</span>
+              <span className="font-bold">InvestInSight</span>
             </Link>
             <nav className="flex items-center gap-6 text-sm">
               <Link href="/dashboard" className="font-medium transition-colors hover:text-primary">
