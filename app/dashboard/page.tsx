@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowUpRight, Bell, ChevronDown, LogOut, Menu, Plus, Search, Settings, User } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "../../components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,25 +14,52 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "../../components/ui/dropdown-menu"
+import { Input } from "../../components/ui/input"
+import { Sheet, SheetContent, SheetTrigger } from "../../components/ui/sheet"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
 
-import PortfolioOverview from "@/components/portfolio-overview"
-import PortfolioChart from "@/components/portfolio-chart"
-import StockList from "@/components/stock-list"
-import { useAuth as useAuthContext } from "../context/AuthContext"; // Renamed to avoid conflict
+import PortfolioOverview from "../../components/portfolio-overview"
+import PortfolioChart from "../../components/portfolio-chart"
+import StockList from "../../components/stock-list"
+import { useAuth as useAuthContext } from "../context/AuthContext"
 
-import AddStockModal from "@/components/add-stock-modal"
+import AddStockModal from "../../components/add-stock-modal"
+import { apiService } from "../../lib/api"
 
 export default function DashboardPage() {
   const router = useRouter()
   const [isAddStockOpen, setIsAddStockOpen] = useState(false)
   const { user } = useAuthContext()
 
+  // New state for search query and results
+  const [searchQuery, setSearchQuery] = useState("")
+  const [searchResults, setSearchResults] = useState([])
+
+  // Effect to trigger search when searchQuery changes with debounce
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (searchQuery.trim() === "") {
+        setSearchResults([])
+        return
+      }
+      searchStocks(searchQuery)
+    }, 300) // 300ms debounce
+
+    return () => clearTimeout(delayDebounceFn)
+  }, [searchQuery])
+
+  const searchStocks = async (query: string) => {
+    const { data, error } = await apiService.searchStocks(query)
+    if (error) {
+      console.error("Error searching stocks:", error)
+      setSearchResults([])
+    } else {
+      setSearchResults(data || [])
+    }
+  }
+
   const handleLogout = () => {
-    // In a real app, this would call your Spring Boot logout endpoint
     router.push("/login")
   }
 
@@ -98,6 +125,8 @@ export default function DashboardPage() {
                 type="search"
                 placeholder="Search stocks..."
                 className="w-full rounded-lg bg-background pl-8 md:w-[300px] lg:w-[300px]"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             <Button variant="outline" size="icon" className="relative">
@@ -150,96 +179,6 @@ export default function DashboardPage() {
             Add Stock
           </Button>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Investment</CardTitle>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                className="h-4 w-4 text-muted-foreground"
-              >
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-              </svg>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">₹125,000</div>
-              <p className="text-xs text-muted-foreground">+2.5% from last month</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Current Value</CardTitle>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                className="h-4 w-4 text-muted-foreground"
-              >
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">₹142,350</div>
-              <p className="text-xs text-muted-foreground">+13.88% from investment</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Profit/Loss</CardTitle>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                className="h-4 w-4 text-muted-foreground"
-              >
-                <rect width="20" height="14" x="2" y="5" rx="2" />
-                <path d="M2 10h20" />
-              </svg>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-500">+₹17,350</div>
-              <p className="text-xs text-muted-foreground">+13.88% return</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Stocks</CardTitle>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                className="h-4 w-4 text-muted-foreground"
-              >
-                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-              </svg>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">8</div>
-              <p className="text-xs text-muted-foreground">+2 from last month</p>
-            </CardContent>
-          </Card>
-        </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
           <Card className="col-span-4">
             <CardHeader>
@@ -273,7 +212,7 @@ export default function DashboardPage() {
               </Button>
             </div>
             <TabsContent value="all-stocks" className="mt-4">
-              <StockList />
+              <StockList stocks={searchQuery.trim() === "" ? undefined : searchResults} />
             </TabsContent>
             <TabsContent value="gainers" className="mt-4">
               <StockList filter="gainers" />
@@ -292,4 +231,3 @@ export default function DashboardPage() {
 function useAuth(): { user: any } {
   throw new Error("Function not implemented.")
 }
-

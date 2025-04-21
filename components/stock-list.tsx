@@ -21,12 +21,25 @@ interface Stock {
   type: string
 }
 
-export default function StockList({ filter = "all" }: { filter?: string }) {
-  const [stocks, setStocks] = useState<Stock[]>([])
+interface StockListProps {
+  filter?: string
+  stocks?: Stock[]
+}
+
+export default function StockList({ filter = "all", stocks }: StockListProps) {
+  const [internalStocks, setInternalStocks] = useState<Stock[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (stocks) {
+      // If stocks prop is provided, use it and skip internal fetch
+      setInternalStocks(stocks)
+      setLoading(false)
+      setError(null)
+      return
+    }
+
     let mounted = true
     const fetchStocks = async () => {
       try {
@@ -65,7 +78,7 @@ export default function StockList({ filter = "all" }: { filter?: string }) {
         }))
 
         console.log('Processed stock data:', stockData)
-        setStocks(stockData)
+        setInternalStocks(stockData)
       } catch (err) {
         console.error('Fetch error:', err)
         if (mounted) setError("Failed to fetch stocks")
@@ -76,7 +89,7 @@ export default function StockList({ filter = "all" }: { filter?: string }) {
 
     fetchStocks()
     return () => { mounted = false }
-  }, [filter])
+  }, [filter, stocks])
 
   if (loading) {
     return (
@@ -92,7 +105,7 @@ export default function StockList({ filter = "all" }: { filter?: string }) {
     return <div className="text-red-500 p-4">Error: {error}</div>
   }
 
-  if (stocks.length === 0) {
+  if (internalStocks.length === 0) {
     return <div className="p-4">No stocks found</div>
   }
 
@@ -108,7 +121,7 @@ export default function StockList({ filter = "all" }: { filter?: string }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {stocks.map((stock) => (
+        {internalStocks.map((stock) => (
           <TableRow key={stock.id}>
             <TableCell className="font-medium">
               {stock.symbol}
