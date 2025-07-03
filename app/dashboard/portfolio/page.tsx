@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { ArrowUpRight, Filter, Plus } from "lucide-react"
 
@@ -15,126 +15,16 @@ import PortfolioPerformance from "../../../components/portfolio-performance"
 import StockList from "../../../components/stock-list"
 import AddStockModal from "../../../components/add-stock-modal"
 
-import { useAuth } from "../../context/AuthContext"
-import { apiService } from "../../lib/api"
-
-interface Stock {
-  symbol: string
-  name: string
-  exchange: string
-  currency: string
-  type: string
-}
-
-interface PortfolioSummary {
-  totalInvestment: number
-  currentValue: number
-  profitLoss: number
-  totalStocks: number
-}
-
-interface PortfolioHolding {
-  symbol: string
-  name: string
-  exchange?: string
-  currency?: string
-  type?: string
-}
-
-interface Portfolio {
-  id: string
-  totalInvestment: number
-  currentValue: number
-  profitLoss: number
-  holdings: PortfolioHolding[]
-}
-
-interface PortfolioData {
-  summary: PortfolioSummary
-  stocks: Stock[]
-  portfolioId: string
-}
-
 export default function PortfolioPage() {
-  const { user } = useAuth()
   const [isAddStockOpen, setIsAddStockOpen] = useState(false)
-  const [portfolioData, setPortfolioData] = useState<PortfolioData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    async function fetchPortfolios() {
-      if (!user) {
-        setPortfolioData(null)
-        setLoading(false)
-        return
-      }
-      setLoading(true)
-      setError(null)
-      try {
-        const response = await apiService.getUserPortfolios()
-        if (Array.isArray(response.data) && response.data.length > 0) {
-          const portfolio: Portfolio = response.data[0]
-          const summary: PortfolioSummary = {
-            totalInvestment: portfolio.totalInvestment,
-            currentValue: portfolio.currentValue,
-            profitLoss: portfolio.profitLoss,
-            totalStocks: portfolio.holdings.length,
-          }
-          const stocks: Stock[] = portfolio.holdings.map((h) => ({
-            symbol: h.symbol,
-            name: h.name,
-            exchange: h.exchange || "",
-            currency: h.currency || "",
-            type: h.type || "",
-          }))
-          setPortfolioData({ summary, stocks, portfolioId: portfolio.id })
-        } else {
-          setPortfolioData(null)
-        }
-      } catch (err) {
-        setError("Failed to load portfolio data.")
-        setPortfolioData(null)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchPortfolios()
-  }, [user])
-
-  if (!user) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Please log in to view your portfolio.</p>
-      </div>
-    )
+  // Mock summary data matching performance metrics mock data
+  const summary = {
+    totalInvestment: 15000,
+    currentValue: 15500,
+    profitLoss: 500,
+    totalStocks: 5,
   }
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Loading portfolio data...</p>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>{error}</p>
-      </div>
-    )
-  }
-
-  if (!portfolioData) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>No portfolio data available for your account.</p>
-      </div>
-    )
-  }
-
-  const { summary, stocks, portfolioId } = portfolioData
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -200,7 +90,7 @@ export default function PortfolioPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">₹{summary.currentValue.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">+13.88% from investment</p>
+              <p className="text-xs text-muted-foreground">+3.33% from investment</p>
             </CardContent>
           </Card>
           <Card>
@@ -222,7 +112,7 @@ export default function PortfolioPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-500">+₹{summary.profitLoss.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">+13.88% return</p>
+              <p className="text-xs text-muted-foreground">+3.33% return</p>
             </CardContent>
           </Card>
           <Card>
@@ -243,7 +133,7 @@ export default function PortfolioPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{summary.totalStocks}</div>
-              <p className="text-xs text-muted-foreground">+2 from last month</p>
+              <p className="text-xs text-muted-foreground">+0 from last month</p>
             </CardContent>
           </Card>
         </div>
@@ -305,7 +195,7 @@ export default function PortfolioPage() {
           </Tabs>
         </div>
       </main>
-      <AddStockModal open={isAddStockOpen} onOpenChange={setIsAddStockOpen} portfolioId={portfolioId} />
+      <AddStockModal open={isAddStockOpen} onOpenChange={setIsAddStockOpen} portfolioId={"mock-portfolio-id"} />
     </div>
   )
 }
