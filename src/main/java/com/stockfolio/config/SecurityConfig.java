@@ -20,6 +20,7 @@ public class SecurityConfig {
             .csrf().disable()
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/api/auth/**").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/api/**").permitAll()
                 .anyRequest().authenticated()
             );

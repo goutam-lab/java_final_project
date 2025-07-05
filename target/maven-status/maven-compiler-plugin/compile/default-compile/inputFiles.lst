@@ -12,8 +12,10 @@ C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\rep
 C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\config\PasswordConfig.java
 C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\model\StockHolding.java
 C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\service\StockService.java
+C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\config\WebConfig.java
 C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\controller\UserController.java
 C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\migration\PortfolioUserIdMigration.java
+C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\config\CorsConfig.java
 C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\model\Transaction.java
 C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\security\JwtAuthenticationFilter.java
 C:\Users\gouta\OneDrive\Desktop\stock-portfolio\src\main\java\com\stockfolio\StockfolioApplication.java
